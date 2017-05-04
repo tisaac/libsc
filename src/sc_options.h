@@ -35,6 +35,48 @@ SC_EXTERN_C_BEGIN;
 
 /** The options data structure is opaque. */
 typedef struct sc_options sc_options_t;
+typedef enum
+{
+  SC_OPTION_SWITCH,
+  SC_OPTION_BOOL,
+  SC_OPTION_INT,
+  SC_OPTION_SIZE_T,
+  SC_OPTION_DOUBLE,
+  SC_OPTION_STRING,
+  SC_OPTION_INIFILE,
+  SC_OPTION_CALLBACK,
+  SC_OPTION_KEYVALUE
+}
+sc_option_type_t;
+
+typedef struct
+{
+  sc_option_type_t    opt_type;
+  int                 opt_char;
+  const char         *opt_name;
+  void               *opt_var;
+  void                (*opt_fn) (void);
+  int                 has_arg;
+  int                 called;           /**< set to 0 and ignored */
+  const char         *help_string;
+  char               *string_value;     /**< set on call but ignored */
+  void               *user_data;
+}
+sc_option_item_t;
+
+struct sc_options
+{
+  char                program_path[BUFSIZ];
+  const char         *program_name;
+  sc_array_t         *option_items;
+  int                 space_type;
+  int                 space_help;
+  int                 args_alloced;
+  int                 first_arg;
+  int                 argc;
+  char              **argv;
+  sc_array_t         *subopt_names;
+};
 
 /** This callback can be invoked during sc_options_parse.
  * \param [in] opt      Valid options data structure.
