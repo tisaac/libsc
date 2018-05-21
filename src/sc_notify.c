@@ -24,7 +24,9 @@
 #include <sc_containers.h>
 #include <sc_notify.h>
 
-int
+sc_notify_alg_t     sc_notify_alg_default = SC_NOTIFY_HYPERCUBE;
+
+static int
 sc_notify_allgather (int *receivers, int num_receivers,
                      int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
@@ -375,9 +377,9 @@ sc_notify_recursive (sc_MPI_Comm mpicomm, int start, int me, int length,
 #endif
 }
 
-int
-sc_notify (int *receivers, int num_receivers,
-           int *senders, int *num_senders, sc_MPI_Comm mpicomm)
+static int
+sc_notify_hypercube (int *receivers, int num_receivers,
+                     int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
   int                 i;
   int                 mpiret;
@@ -431,4 +433,30 @@ sc_notify (int *receivers, int num_receivers,
   sc_array_reset (&output);
 
   return sc_MPI_SUCCESS;
+}
+
+int
+sc_notify (sc_notify_alg_t alg, int *receivers, int num_receivers, int
+           *senders, int *num_senders, sc_MPI_Comm mpicomm)
+{
+  int                 ret = -1;
+
+  if (alg == SC_NOTIFY_DEFAULT) {
+    alg = sc_notify_alg_default;
+  }
+  switch (alg) {
+  case SC_NOTIFY_ALLGATHER:
+    ret =
+      sc_notify_allgather (receivers, num_receivers, senders, num_senders,
+                           mpicomm);
+    break;
+  case SC_NOTIFY_HYPERCUBE:
+    ret =
+      sc_notify_hypercube (receivers, num_receivers, senders, num_senders,
+                           mpicomm);
+    break;
+  default:
+    SC_ABORT_NOT_REACHED ();
+  }
+  return ret;
 }
