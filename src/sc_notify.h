@@ -35,6 +35,7 @@ typedef enum sc_notify_alg
                        /**< Use whichever method is the current value of sc_notify_alg_default */
   SC_NOTIFY_ALLGATHER, /**< Allgather total number of messages and then allgatherv to broadcast all message destinations to all processes */
   SC_NOTIFY_HYPERCUBE, /**< Recursive hypercube routing of messages */
+  SC_NOTIFY_ALLTOALL,
 }
 sc_notify_alg_t;
 

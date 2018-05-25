@@ -496,6 +496,11 @@ sc_notify (sc_notify_alg_t alg, int *receivers, int num_receivers, int
       sc_notify_hypercube (receivers, num_receivers, senders, num_senders,
                            mpicomm);
     break;
+  case SC_NOTIFY_ALLTOALL:
+	ret = 
+	  sc_notify_alltoall (receivers, num_receivers, senders, num_senders,
+			  			  mpicomm);
+	break;
   default:
     SC_ABORT_NOT_REACHED ();
   }
