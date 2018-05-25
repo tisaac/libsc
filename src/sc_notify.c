@@ -79,6 +79,47 @@ sc_notify_allgather (int *receivers, int num_receivers,
   return sc_MPI_SUCCESS;
 }
 
+static int
+sc_notify_alltoall (int *receivers, int num_receivers,
+                     int *senders, int *num_senders, sc_MPI_Comm mpicomm)
+{
+  int                 i, j;
+  int                 found_num_senders;
+  int                 mpiret;
+  int                 mpisize, mpirank;
+  int				 *buffered_receivers;
+  int				 *trans_receivers;
+
+  mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
+  SC_CHECK_MPI (mpiret);
+  mpiret = sc_MPI_Comm_rank (mpicomm, &mpirank);
+  SC_CHECK_MPI (mpiret);
+
+  buffered_receivers = SC_ALLOC_ZERO (int, mpisize);
+  trans_receivers = SC_ALLOC (int, mpisize);
+  for (i = 0; i < num_receivers; i++){
+  	buffered_receivers[receivers[i]] = 1;
+  }
+
+  mpiret_ sc_MPI_Alltoall (buffered_receivers, mpisize, sc_MPI_INT
+		  				   trans_receivers, mpisize, sc_MPI_INT, mpicomm);
+  SC_CHECK_MPI (mpiret);
+
+  found_num_senders = 0;
+  for (i = 0; i < mpisize; i++){
+  	  if(all_receivers[i]){
+	  	senders[i] = i;
+		found_num_senders++;
+	  }
+  }
+
+  *num_senders = found_num_senders;
+  SC_FREE (buffered_receivers);
+  SC_FREE (trans_receivers);
+
+  return sc_MPI_SUCCESS;
+}
+
 /** Internally used function to merge two data arrays.
  * The internal data format of the arrays is as follows:
  * forall(torank): (torank, howmanyfroms, listoffromranks).
