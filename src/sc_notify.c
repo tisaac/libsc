@@ -102,14 +102,13 @@ sc_notify_alltoall (int *receivers, int num_receivers,
   }
 
   mpiret_ sc_MPI_Alltoall (buffered_receivers, mpisize, sc_MPI_INT
-		  				   trans_receivers, mpisize, sc_MPI_INT, mpicomm);
+		  				   senders, mpisize, sc_MPI_INT, mpicomm);
   SC_CHECK_MPI (mpiret);
 
   found_num_senders = 0;
   for (i = 0; i < mpisize; i++){
-  	  if(all_receivers[i]){
-	  	senders[i] = i;
-		found_num_senders++;
+  	  if(senders[i]){
+	  	senders[found_num_senders++] = i;
 	  }
   }
 
