@@ -81,14 +81,14 @@ sc_notify_allgather (int *receivers, int num_receivers,
 
 static int
 sc_notify_alltoall (int *receivers, int num_receivers,
-                     int *senders, int *num_senders, sc_MPI_Comm mpicomm)
+                    int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
   int                 i, j;
   int                 found_num_senders;
   int                 mpiret;
   int                 mpisize, mpirank;
-  int				 *buffered_receivers;
-  int			     *all_receivers;
+  int                *buffered_receivers;
+  int                *all_receivers;
 
   mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
   SC_CHECK_MPI (mpiret);
@@ -96,23 +96,22 @@ sc_notify_alltoall (int *receivers, int num_receivers,
   SC_CHECK_MPI (mpiret);
 
   buffered_receivers = SC_ALLOC_ZERO (int, mpisize);
-  for (i = 0; i < num_receivers; i++){
-	SC_ASSERT(receivers[i] >= 0);
-	SC_ASSERT(receivers[i] < mpisize);
-  	buffered_receivers[receivers[i]] = 1;
+  for (i = 0; i < num_receivers; i++) {
+    SC_ASSERT (receivers[i] >= 0 && receivers[i] < mpisize);
+    buffered_receivers[receivers[i]] = 1;
   }
 
-  all_receivers = SC_ALLOC_ZERO (int, mpisize);
+  all_receivers = SC_ALLOC (int, mpisize);
 
-  mpiret = sc_MPI_Alltoall (buffered_receivers, mpisize, sc_MPI_INT,
-		  				   all_receivers, mpisize, sc_MPI_INT, mpicomm);
+  mpiret = sc_MPI_Alltoall (buffered_receivers, 1, sc_MPI_INT,
+                            all_receivers, 1, sc_MPI_INT, mpicomm);
   SC_CHECK_MPI (mpiret);
 
   found_num_senders = 0;
-  for (i = 0; i < mpisize; i++){
-  	  if(all_receivers[i]){
-	  	senders[found_num_senders++] = i;
-	  }
+  for (i = 0; i < mpisize; i++) {
+    if (all_receivers[i]) {
+      senders[found_num_senders++] = i;
+    }
   }
 
   *num_senders = found_num_senders;
@@ -499,10 +498,9 @@ sc_notify (sc_notify_alg_t alg, int *receivers, int num_receivers, int
                            mpicomm);
     break;
   case SC_NOTIFY_ALLTOALL:
-	ret = 
-	  sc_notify_alltoall (receivers, num_receivers, senders, num_senders,
-			  			  mpicomm);
-	break;
+    ret = sc_notify_alltoall (receivers, num_receivers, senders, num_senders,
+                              mpicomm);
+    break;
   default:
     SC_ABORT_NOT_REACHED ();
   }
