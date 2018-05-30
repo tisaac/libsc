@@ -88,7 +88,7 @@ sc_notify_alltoall (int *receivers, int num_receivers,
   int                 mpiret;
   int                 mpisize, mpirank;
   int				 *buffered_receivers;
-  int				 *trans_receivers;
+  int			     *all_receivers;
 
   mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
   SC_CHECK_MPI (mpiret);
@@ -96,25 +96,28 @@ sc_notify_alltoall (int *receivers, int num_receivers,
   SC_CHECK_MPI (mpiret);
 
   buffered_receivers = SC_ALLOC_ZERO (int, mpisize);
-  trans_receivers = SC_ALLOC (int, mpisize);
   for (i = 0; i < num_receivers; i++){
+	SC_ASSERT(receivers[i] >= 0);
+	SC_ASSERT(receivers[i] < mpisize);
   	buffered_receivers[receivers[i]] = 1;
   }
 
-  mpiret_ sc_MPI_Alltoall (buffered_receivers, mpisize, sc_MPI_INT
-		  				   senders, mpisize, sc_MPI_INT, mpicomm);
+  all_receivers = SC_ALLOC_ZERO (int, mpisize);
+
+  mpiret = sc_MPI_Alltoall (buffered_receivers, mpisize, sc_MPI_INT,
+		  				   all_receivers, mpisize, sc_MPI_INT, mpicomm);
   SC_CHECK_MPI (mpiret);
 
   found_num_senders = 0;
   for (i = 0; i < mpisize; i++){
-  	  if(senders[i]){
+  	  if(all_receivers[i]){
 	  	senders[found_num_senders++] = i;
 	  }
   }
 
   *num_senders = found_num_senders;
   SC_FREE (buffered_receivers);
-  SC_FREE (trans_receivers);
+  SC_FREE (all_receivers);
 
   return sc_MPI_SUCCESS;
 }
