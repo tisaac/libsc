@@ -44,6 +44,26 @@ extern sc_notify_alg_t sc_notify_alg_default;
 /** Collective call to notify a set of receiver ranks of current rank.
  * More generally, this function serves to transpose the nonzero pattern of a
  * matrix, where each row and column corresponds to an MPI rank in order.
+ * \param [in] receivers        Sorted and unique array of MPI ranks to inform.
+ * \param [in] num_receivers    Count of ranks contained in receivers.
+ * \param [in,out] senders      Array of at least size sc_MPI_Comm_size.
+ *                              On output it contains the notifying ranks,
+ *                              whose number is returned in \b num_senders.
+ * \param [out] num_senders     On output the number of notifying ranks.
+ * \param [in] mpicomm          MPI communicator to use.
+ * \return                      Aborts on MPI error or returns sc_MPI_SUCCESS.
+ */
+int                 sc_notify (int *receivers, int num_receivers,
+                               int *senders, int *num_senders,
+                               sc_MPI_Comm mpicomm);
+
+int                 sc_notify_allgather (int *receivers, int num_receivers,
+                                         int *senders, int *num_senders,
+                                         sc_MPI_Comm mpicomm);
+
+/** Collective call to notify a set of receiver ranks of current rank.
+ * More generally, this function serves to transpose the nonzero pattern of a
+ * matrix, where each row and column corresponds to an MPI rank in order.
  * \param [in] alg              The parallel algorithm used to compute the
  *                              communication inversion.
  * \param [in] receivers        Sorted and unique array of MPI ranks to inform.
@@ -55,9 +75,9 @@ extern sc_notify_alg_t sc_notify_alg_default;
  * \param [in] mpicomm          MPI communicator to use.
  * \return                      Aborts on MPI error or returns sc_MPI_SUCCESS.
  */
-int                 sc_notify (sc_notify_alg_t alg, int *receivers,
-                               int num_receivers, int *senders,
-                               int *num_senders, sc_MPI_Comm mpicomm);
+int                 sc_notify_ext (sc_notify_alg_t alg, int *receivers,
+                                   int num_receivers, int *senders,
+                                   int *num_senders, sc_MPI_Comm mpicomm);
 
 SC_EXTERN_C_END;
 

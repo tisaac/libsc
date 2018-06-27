@@ -26,7 +26,7 @@
 
 sc_notify_alg_t     sc_notify_alg_default = SC_NOTIFY_HYPERCUBE;
 
-static int
+int
 sc_notify_allgather (int *receivers, int num_receivers,
                      int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
@@ -83,7 +83,7 @@ static int
 sc_notify_alltoall (int *receivers, int num_receivers,
                     int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
-  int                 i, j;
+  int                 i;
   int                 found_num_senders;
   int                 mpiret;
   int                 mpisize, mpirank;
@@ -478,8 +478,8 @@ sc_notify_hypercube (int *receivers, int num_receivers,
 }
 
 int
-sc_notify (sc_notify_alg_t alg, int *receivers, int num_receivers, int
-           *senders, int *num_senders, sc_MPI_Comm mpicomm)
+sc_notify_ext (sc_notify_alg_t alg, int *receivers, int num_receivers,
+               int *senders, int *num_senders, sc_MPI_Comm mpicomm)
 {
   int                 ret = -1;
 
@@ -505,4 +505,12 @@ sc_notify (sc_notify_alg_t alg, int *receivers, int num_receivers, int
     SC_ABORT_NOT_REACHED ();
   }
   return ret;
+}
+
+int
+sc_notify (int *receivers, int num_receivers,
+           int *senders, int *num_senders, sc_MPI_Comm mpicomm)
+{
+  return sc_notify_ext (sc_notify_alg_default, receivers, num_receivers,
+                        senders, num_senders, mpicomm);
 }

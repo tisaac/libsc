@@ -54,19 +54,20 @@ main (int argc, char **argv)
   }
   qsort (receivers, num_receivers, sizeof (int), sc_int_compare);
 
-  SC_GLOBAL_INFO ("Testing SC_NOTIFY_ALLGATHER\n");
+  SC_GLOBAL_INFO ("Testing sc_notify_allgather\n");
   senders = SC_ALLOC (int, mpisize);
   elapsed_allgather = -sc_MPI_Wtime ();
-  mpiret = sc_notify (SC_NOTIFY_ALLGATHER, receivers, num_receivers, senders,
-                      &num_senders, mpicomm);
+  mpiret = sc_notify_allgather (receivers, num_receivers, senders,
+                                &num_senders, mpicomm);
   SC_CHECK_MPI (mpiret);
   elapsed_allgather += sc_MPI_Wtime ();
 
   SC_GLOBAL_INFO ("Testing SC_NOTIFY_HYPERCUBE\n");
   senders2 = SC_ALLOC (int, mpisize);
   elapsed_native = -sc_MPI_Wtime ();
-  mpiret = sc_notify (SC_NOTIFY_HYPERCUBE, receivers, num_receivers, senders2,
-                      &num_senders2, mpicomm);
+  mpiret =
+    sc_notify_ext (SC_NOTIFY_HYPERCUBE, receivers, num_receivers, senders2,
+                   &num_senders2, mpicomm);
   SC_CHECK_MPI (mpiret);
   elapsed_native += sc_MPI_Wtime ();
 
