@@ -38,6 +38,7 @@
  * \ingroup sc
  */
 
+/* TODO: make mstamp/obstack a configure option */
 /** We are using sc_mstamp_t instead of GNU obstack in sc_mempool_t. */
 #define SC_MEMPOOL_MSTAMP
 
